@@ -6,6 +6,7 @@ from apps.technics.models import Technique
 
 class PaymentGraph(models.Model):
     act = models.ForeignKey(Act, on_delete=models.SET_NULL, null=True)
+    is_active = models.BooleanField(default=False, null=True)
 
     class Meta:
         db_table = 'PaymentGraph'

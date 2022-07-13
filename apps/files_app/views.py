@@ -2,7 +2,6 @@ from django.http import Http404
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 from config.utils.api_exceptions import APIValidation
 from apps.technics.models import Technique
 from apps.files_app.models import File
@@ -57,7 +56,7 @@ class DragDropCreateAPIView(APIView):
                 "message": "File successfully uploaded",
                 "files": files,
                 "status": status.HTTP_201_CREATED
-            })
+            }, status=status.HTTP_201_CREATED)
 
 
 class DragDropDeleteAPIView(APIView):
@@ -73,4 +72,7 @@ class DragDropDeleteAPIView(APIView):
         file.delete()
         logger.debug(f'func_name: {str(self.get_view_name())}; drag_drop_file_deleted-{str(pk)}-id '
                      f'; user:{str(request.user)};')
-        return Response(status.HTTP_204_NO_CONTENT)
+        return Response({
+            "message": "File successfully deleted",
+            "status": status.HTTP_200_OK
+        }, status=status.HTTP_200_OK)

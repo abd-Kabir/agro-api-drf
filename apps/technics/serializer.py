@@ -3,6 +3,22 @@ from rest_framework import serializers
 from apps.technics.models import Technique, TechniqueName, TechniqueType
 
 
+class TechnicsEditSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Technique
+        fields = ['id',
+                  'type',
+                  'name',
+                  'model',
+                  'manufacturer',
+                  'guarantors_num',  # TODO: buni olib tashlash kere bo'ladi keyinchalik
+                  'price',
+                  'yearly_leasing_percent',
+                  'leasing_term',
+                  'subsidy',
+                  'prepaid_percent', ]
+
+
 class TechnicsListSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='name.name')
     type = serializers.CharField(source='type.name')
@@ -66,8 +82,6 @@ class TechnicsCreateSerializer(serializers.ModelSerializer):
 
 
 class TechnicsUpdateSerializer(serializers.ModelSerializer):
-    # name = serializers.CharField(source='name.name')
-
     class Meta:
         model = Technique
         fields = ['name',

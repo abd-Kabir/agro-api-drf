@@ -23,7 +23,7 @@ from apps.technics.models import Technique, TechniqueType, TechniqueName
 from apps.technics.serializer import (TechnicsCreateSerializer,
                                       TechnicsListSerializer,
                                       TechnicsUpdateSerializer, TechnicsNamesSerializer, TechnicsTypesSerializer,
-                                      TechnicsCompanyListSerializer)
+                                      TechnicsCompanyListSerializer, TechnicsEditSerializer)
 
 logger = logging.getLogger()
 
@@ -47,7 +47,7 @@ class TechnicsListAPIView(ListAPIView):
             queryset = self.filter_queryset(self.get_queryset())
             ordering_name = request.query_params.get('ordering')
             if ordering_name:
-                queryset = ordering_technique_model(ordering_name, Technique, queryset, self.ordering_fields)
+                queryset = ordering_technique_model(ordering_name, queryset, self.ordering_fields)
             serializer = self.get_serializer(queryset, many=True)
             page = self.paginate_queryset(serializer.data)
             logger.debug(f'func_name: {str(self.get_view_name())};  user:{str(request.user)};')
@@ -130,15 +130,24 @@ class TechnicsUpdateAPIView(UpdateAPIView):
             instance = self.get_object()
             serializer = self.get_serializer(instance, data=request.data, partial=partial)
             serializer.is_valid(raise_exception=True)
-            self.perform_update(serializer)
-            result = {
-                "message": "Successfully updated",
-                "details": serializer.data,
-                "status": 200,
-            }
-            logger.debug(f'func_name: {str(self.get_view_name())}; updating_tech-{kwargs["pk"]}-id'
-                         f'; user:{str(request.user)};')
-            return Response(result)
+            type_id = serializer.validated_data['name'].type_id
+            req_type_id = instance.type_id
+            if type_id == req_type_id:
+                self.perform_update(serializer)
+                logger.debug(f'func_name: {str(self.get_view_name())}; updating_tech-{kwargs["pk"]}-id'
+                             f'; user:{str(request.user)};')
+                return Response({
+                    "message": "Successfully updated",
+                    "technique": instance.id,
+                    "status": 200,
+                }, status=status.HTTP_200_OK)
+            else:
+                logger.debug(f'func_name: {str(self.get_view_name())}; failed_to_update_tech-{kwargs["pk"]}-id'
+                             f'; user:{str(request.user)};')
+                return Response({
+                    "message": "Technique name are not matching with technique type",
+                    "status": 400,
+                }, status=status.HTTP_400_BAD_REQUEST)
         except Exception as exc:
             logger.debug(f'func_name: {str(self.get_view_name())}; update_failed-{exc.__doc__}'
                          f'; user:{str(request.user)};')
@@ -162,29 +171,52 @@ class TechnicsDetailAPIView(RetrieveAPIView):
             raise APIValidation(detail=exc, status_code=status.HTTP_400_BAD_REQUEST)
 
 
+class TechnicsEditDataAPIView(RetrieveAPIView):
+    queryset = Technique.objects.all()
+    serializer_class = TechnicsEditSerializer
+
+    def get(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            serializer = self.get_serializer(instance)
+            data = serializer.data
+            data['technique_names'] = []
+
+            list_of_names = list(TechniqueName.objects.filter(type=data['type']).values_list('id', 'name'))
+            for _id, _type in list_of_names:
+                data['technique_names'].append({
+                    'id': _id,
+                    'label': _type,
+                    'value': _type
+                })
+            logger.debug(f'func_name: {str(self.get_view_name())}; retrieving_tech-{kwargs["pk"]}-id '
+                         f'; user:{str(request.user)};')
+            return Response({
+                "message": "Successfully retrieved",
+                "data": data
+            })
+        except Exception as exc:
+            logger.debug(f'func_name: {str(self.get_view_name())}; retrieve_failed-{exc}'
+                         f'; user:{str(request.user)};')
+            raise APIValidation(detail=exc, status_code=status.HTTP_400_BAD_REQUEST)
+
+
 class TechnicsDeleteAPIView(DestroyAPIView):
     queryset = Technique.objects.all()
-    serializer_class = TechnicsUpdateSerializer
-
-    # permission_classes = [IsAuthenticated, ]
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         files = File.objects.filter(technique_id=kwargs['pk'])
         for file in files:
-            os.remove(file.path)
-        if os.path.isfile(instance.technique_passport.path):
-            os.remove(instance.tex_passport.path)
-        if os.path.isfile(instance.technique_manual.path):
-            os.remove(instance.texnika_qollanma.path)
-
+            if os.path.isfile(file.path):
+                os.remove(file.path)
         self.perform_destroy(instance)
         logger.debug(f'func_name: {str(self.get_view_name())}; deleted_files_belong_tech-{kwargs["pk"]}-id '
                      f'; user:{str(request.user)};')
         return Response({
-            "message": "Successfully deleted.",
-            "status": status.HTTP_204_NO_CONTENT
-        })
+            "message": "File successfully deleted",
+            "status": status.HTTP_200_OK
+        }, status=status.HTTP_200_OK)
 
 
 class TechnicsTypeInfoAPIView(APIView):
@@ -304,12 +336,13 @@ class TechnicsCompanyList(ListAPIView):
             queryset = self.filter_queryset(self.get_queryset())
             ordering_name = request.query_params.get('ordering')
             if ordering_name:
-                queryset = ordering_technique_model(ordering_name, Technique, queryset, self.ordering_fields)
+                queryset = ordering_technique_model(ordering_name, queryset, self.ordering_fields)
             serializer = self.get_serializer(queryset, many=True)
 
             for i in serializer.data:
                 i['orders_count'] = Order.objects.filter(technique_id=i.get('id')).count()
-                i['leasing_count'] = LeasingAgreement.objects.filter(order_model__technique_id=i.get('id')).count()
+                i['leasing_count'] = LeasingAgreement.objects.filter(
+                    expert_assessment__order_model__technique_id=i.get('id')).count()
 
             page = self.paginate_queryset(serializer.data)
             logger.debug(f'func_name: {str(self.get_view_name())};  user:{str(request.user)};')

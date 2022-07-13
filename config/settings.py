@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'apps.payment_graph',
     'apps.acts',
     'apps.regions',
+    'apps.expert_assessment',
 ]
 
 MIDDLEWARE = [
@@ -157,7 +158,7 @@ REST_FRAMEWORK = {
     # 'EXCEPTION_HANDLER': 'rest_framework.exceptions.server_error',
     'DATE_INPUT_FORMATS': ["%d.%m.%Y"],
     'DEFAULT_PAGINATION_CLASS': 'config.pagination.APIPagination',
-    'PAGE_SIZE': 10,
+    'PAGE_SIZE': 100,
 
 }
 
@@ -196,3 +197,4 @@ LOGGING = {
         }
     }
 }
+

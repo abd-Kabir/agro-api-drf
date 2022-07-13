@@ -11,9 +11,10 @@ urlpatterns = [
     path('tool/', include('apps.tools.urls')),
     path('orders/', include('apps.orders.urls')),
     path('leasing/', include('apps.leasing_agreem.urls')),
-    path('guarantee/', include('apps.guarantee_agreem.urls')),
+    path('g/', include('apps.guarantee_agreem.urls')),
     path('payment-graph/', include('apps.payment_graph.urls')),
     path('act/', include('apps.acts.urls')),
+    path('expert/', include('apps.expert_assessment.urls')),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from apps.acts.models import Act
+from apps.expert_assessment.models import ExpertAssessment
 from apps.leasing_agreem.models import LeasingAgreement
 from apps.orders.models import Order
 from apps.payment_graph.models import PaymentGraph, PaymentTable
@@ -22,7 +23,7 @@ class OrderTechnique(serializers.ModelSerializer):
                   'prepaid_price', ]
 
 
-class LeasingOrder(serializers.ModelSerializer):
+class ExpertOrder(serializers.ModelSerializer):
     technique = OrderTechnique()
 
     class Meta:
@@ -31,14 +32,23 @@ class LeasingOrder(serializers.ModelSerializer):
                   'technique', ]
 
 
+class LeasingExpert(serializers.ModelSerializer):
+    order_model = ExpertOrder()
+
+    class Meta:
+        model = ExpertAssessment
+        fields = ['id',
+                  'order_model', ]
+
+
 class ActLeasing(serializers.ModelSerializer):
-    order_model = LeasingOrder()
+    expert_assessment = LeasingExpert()
 
     class Meta:
         model = LeasingAgreement
         fields = ['id',
                   'contract_price',
-                  'order_model', ]
+                  'expert_assessment', ]
 
 
 class PaymentAct(serializers.ModelSerializer):
@@ -61,7 +71,7 @@ class PaymentGraphSerializer(serializers.ModelSerializer):
 
 
 class PaymentTableSerializer(serializers.ModelSerializer):
-    payment_graph = PaymentGraphSerializer()
+    # payment_graph = PaymentGraphSerializer()
 
     class Meta:
         model = PaymentTable
@@ -72,8 +82,7 @@ class PaymentTableSerializer(serializers.ModelSerializer):
                   'quarterly_lease_term_part_of_value',
                   'quarterly_percent_lease_term_payment',
                   'quarterly_lease_term_payment',
-                  'is_paid',
-                  'payment_graph', ]
+                  'is_paid', ]
 
 
 class PaymentGraphCreateSerializer(serializers.ModelSerializer):
@@ -105,8 +114,17 @@ class LeasingOrderListFirst(serializers.ModelSerializer):
                   'technique', ]
 
 
-class ActLeasingListFirst(serializers.ModelSerializer):
+class ActExpertAssessmentListFirst(serializers.ModelSerializer):
     order_model = LeasingOrderListFirst()
+
+    class Meta:
+        model = ExpertAssessment
+        fields = ['id',
+                  'order_model', ]
+
+
+class ActLeasingListFirst(serializers.ModelSerializer):
+    expert_assessment = ActExpertAssessmentListFirst()
 
     class Meta:
         model = LeasingAgreement
@@ -115,7 +133,7 @@ class ActLeasingListFirst(serializers.ModelSerializer):
                   'leasing_date',
                   'contract_price',
                   'number_of_techs',
-                  'order_model', ]
+                  'expert_assessment', ]
 
 
 class PaymentActListFirst(serializers.ModelSerializer):

@@ -1,4 +1,5 @@
 from django.urls import path
+
 from apps.payment_graph.views import PaymentTableRetrieveAPIView, PaymentGraphCreateAPIView, PaymentListFirstAPIView
 
 app_name = 'payment_graph'

@@ -1,11 +1,19 @@
 from rest_framework import serializers
-from apps.guarantee_agreem.models import GuaranteeAgreement
+
+from apps.guarantee_agreem.models import Guarantor, GuaranteeAgreement
 
 
-class GuaranteeListSerializer(serializers.ModelSerializer):
+class GuaranteeSerializer(serializers.ModelSerializer):
     class Meta:
         model = GuaranteeAgreement
-        fields = ['id',
-                  'guarantors_signed_count',
-                  'guarantor',
+        fields = ['guarantee_num',
+                  'guarantee_date',
                   'leasing_agreem', ]
+
+
+class GuarantorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Guarantor
+        fields = ['id',
+                  'farmer_stir',
+                  'guarantee_agreem', ]

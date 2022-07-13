@@ -3,6 +3,7 @@ from apps.leasing_agreem.models import LeasingAgreement
 
 
 class LeasingListSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = LeasingAgreement
         fields = ['id',
@@ -11,9 +12,7 @@ class LeasingListSerializer(serializers.ModelSerializer):
                   'contract_price',
                   'number_of_techs',
                   'lessor_sign',
-                  'lessee_sign',
-                  'guarantor_sign',
-                  'order_model', ]
+                  'lessee_sign', ]
 
 
 class LeasingCreateSerializer(serializers.ModelSerializer):
@@ -23,7 +22,6 @@ class LeasingCreateSerializer(serializers.ModelSerializer):
         model = LeasingAgreement
         fields = ['leasing_num',
                   'leasing_date',
-                  'order_model',
+                  'expert_assessment',
                   'contract_price',
-                  'number_of_techs',
-                  'order_model', ]
+                  'number_of_techs', ]

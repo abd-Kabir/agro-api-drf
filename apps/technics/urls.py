@@ -9,7 +9,8 @@ from apps.technics.views import (TechnicsCreateAPIView,
                                  TechnicsNamePKInfoAPIView,
                                  TechnicsNameCreateAPIView,
                                  TechnicsTypeCreateAPIView,
-                                 TechnicsCompanyList)
+                                 TechnicsCompanyList,
+                                 TechnicsEditDataAPIView)
 
 app_name = 'technics'
 urlpatterns = [
@@ -18,6 +19,7 @@ urlpatterns = [
     path('update/<int:pk>/', TechnicsUpdateAPIView.as_view(), name="update"),
     path('delete/<int:pk>/', TechnicsDeleteAPIView.as_view(), name="delete"),
     path('detail/<int:pk>/', TechnicsDetailAPIView.as_view(), name="details"),
+    path('detail-edit/<int:pk>/', TechnicsEditDataAPIView.as_view(), name="edit_page_data"),
     path('types-info/', TechnicsTypeInfoAPIView.as_view(), name="technics_types"),
     path('types-info/create/', TechnicsTypeCreateAPIView.as_view(), name="technics_types_create"),
     path('names-info/', TechnicsNameInfoAPIView.as_view(), name="technics_names"),

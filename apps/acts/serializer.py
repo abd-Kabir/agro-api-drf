@@ -1,9 +1,11 @@
 from rest_framework import serializers
 
 from apps.acts.models import Act
+from apps.expert_assessment.models import ExpertAssessment
 from apps.leasing_agreem.models import LeasingAgreement
 from apps.orders.models import Order
 from apps.technics.models import Technique
+from apps.tools.models import FarmerSTIR
 
 
 class ActTechniqueSerializer(serializers.ModelSerializer):
@@ -27,18 +29,27 @@ class ActOrderSerializer(serializers.ModelSerializer):
         fields = ['technique', ]
 
 
-class ActLeasingSerializer(serializers.ModelSerializer):
+class ActExpertSerializer(serializers.ModelSerializer):
     order_model = ActOrderSerializer()
+
+    class Meta:
+        model = ExpertAssessment
+        fields = ['order_model', ]
+
+
+class ActLeasingSerializer(serializers.ModelSerializer):
+    expert_assessment = ActExpertSerializer()
 
     class Meta:
         model = LeasingAgreement
         fields = ['number_of_techs',
                   'contract_price',
-                  'order_model', ]
+                  'expert_assessment', ]
 
 
 class ActListSerializer(serializers.ModelSerializer):
     leasing_agreem = ActLeasingSerializer()
+    full_name = serializers.CharField(source='seller_stir.full_name', allow_null=True)
 
     class Meta:
         model = Act
@@ -48,7 +59,7 @@ class ActListSerializer(serializers.ModelSerializer):
                   'lessor_sign',
                   'lessee_sign',
                   'seller_sign',
-                  'seller',
+                  'full_name',
                   'leasing_agreem', ]
 
 
@@ -59,7 +70,8 @@ class ActCreateSerializer(serializers.ModelSerializer):
         model = Act
         fields = ['act_num',
                   'act_date',
-                  'seller',
+                  'branch_name',
+                  'seller_stir',
                   'detected_defects_header',
                   'detected_defects_info',
                   'quality_conclusion_header',

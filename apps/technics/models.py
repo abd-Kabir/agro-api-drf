@@ -1,6 +1,8 @@
 from django.db import models
 
 
+# TODO: texnika delete bo'ganida, Delete bo'gan texnikaga tegishli buyurtmalarni nima qilish kerak bo'ladi
+
 class Technique(models.Model):
     model = models.CharField(max_length=100)  # модель техники
     manufacturer = models.CharField(max_length=100)  # производитель
@@ -23,7 +25,7 @@ class Technique(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if self.prepaid_price is None or self.prepaid_percent == '':
-            self.prepaid_price = self.price * self.prepaid_percent / 100
+            self.prepaid_price = self.price * self.prepaid_percent / 100  # TODO: bu custom save function o'zgarishi mumkin
         super().save(force_insert, force_update, using, update_fields)
 
     class Meta:

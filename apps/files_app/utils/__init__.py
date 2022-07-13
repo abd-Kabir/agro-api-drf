@@ -27,7 +27,7 @@ def gen_new_name(file) -> str:
     return "%s.%s" % (unique_code(), get_extension(filename=file.name))
 
 
-def upload_file(file, tech_id=None, order_id=None, leasing_id=None, guarantee_id=None):
+def upload_file(file, tech_id=None, order_id=None, leasing_id=None, guarantor_id=None, expert_assessment_id=None):
     name = file.name
     size = file.size
     gen_name = gen_new_name(file)
@@ -58,14 +58,22 @@ def upload_file(file, tech_id=None, order_id=None, leasing_id=None, guarantee_id
                              content_type=content_type,
                              extension=extension,
                              leasing_agreem=leasing_id)
-    elif guarantee_id:
+    elif guarantor_id:
         uploaded_file = File(name=name,
                              size=size,
                              gen_name=gen_name,
                              path=path,
                              content_type=content_type,
                              extension=extension,
-                             guarantee_agreem=guarantee_id)
+                             guarantee_agreem=guarantor_id)
+    elif expert_assessment_id:
+        uploaded_file = File(name=name,
+                             size=size,
+                             gen_name=gen_name,
+                             path=path,
+                             content_type=content_type,
+                             extension=extension,
+                             expert_assessment=expert_assessment_id)
     else:
         uploaded_file = File(name=name,
                              size=size,
