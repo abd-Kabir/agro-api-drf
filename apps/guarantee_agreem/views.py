@@ -67,10 +67,14 @@ class GuarantorListAPIView(ListAPIView):
                 guarantors_list.append(guarantee_data)
                 formatted_leasing = guarantors_list[data]['guarantee']['guarantee_date'].strftime('%d.%m.%Y')
                 guarantors_list[data]['guarantee']['guarantee_date'] = formatted_leasing
+                response_list = {
+                    'technique_id': queryset[
+                        data].guarantee_agreem.leasing_agreem.expert_assessment.order_model.technique.id,
+                    'contract_price': queryset[
+                        data].guarantee_agreem.leasing_agreem.contract_price, }
             response_list['guarantors_count'] = queryset[
                 0].guarantee_agreem.leasing_agreem.expert_assessment.guarantors_count
             response_list['data'] = guarantors_list
-
         return Response(response_list)
 
 

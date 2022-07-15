@@ -1,6 +1,11 @@
 from rest_framework import serializers
-
 from apps.technics.models import Technique, TechniqueName, TechniqueType
+
+
+class TechnicsDetailLeasingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Technique
+        fields = ['id', ]
 
 
 class TechnicsEditSerializer(serializers.ModelSerializer):

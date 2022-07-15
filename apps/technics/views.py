@@ -23,7 +23,8 @@ from apps.technics.models import Technique, TechniqueType, TechniqueName
 from apps.technics.serializer import (TechnicsCreateSerializer,
                                       TechnicsListSerializer,
                                       TechnicsUpdateSerializer, TechnicsNamesSerializer, TechnicsTypesSerializer,
-                                      TechnicsCompanyListSerializer, TechnicsEditSerializer)
+                                      TechnicsCompanyListSerializer, TechnicsEditSerializer,
+                                      TechnicsDetailLeasingSerializer)
 
 logger = logging.getLogger()
 
@@ -195,6 +196,21 @@ class TechnicsEditDataAPIView(RetrieveAPIView):
                 "message": "Successfully retrieved",
                 "data": data
             })
+        except Exception as exc:
+            logger.debug(f'func_name: {str(self.get_view_name())}; retrieve_failed-{exc}'
+                         f'; user:{str(request.user)};')
+            raise APIValidation(detail=exc, status_code=status.HTTP_400_BAD_REQUEST)
+
+
+class TechnicsDetailLeasingAPIView(RetrieveAPIView):
+    queryset = Technique.objects.all()
+    serializer_class = TechnicsDetailLeasingSerializer
+
+    def get(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            serializer = self.get_serializer(instance)
+            data = serializer.data
         except Exception as exc:
             logger.debug(f'func_name: {str(self.get_view_name())}; retrieve_failed-{exc}'
                          f'; user:{str(request.user)};')
